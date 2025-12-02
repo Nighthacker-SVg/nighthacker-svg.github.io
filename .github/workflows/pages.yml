@@ -16,13 +16,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Prepare public directory
+        run: |
+          rm -rf public
+          mkdir -p public
+          # copy files into public while excluding .git and the workflow folder
+          rsync -av --exclude='.git' --exclude='.github' --exclude='.gitignore' --exclude='node_modules' ./ public/
+
       - name: Configure Pages
         uses: actions/configure-pages@v3
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+      - name: Upload Pages artifact
+        # Use v2 of upload-pages-artifact which no longer depends on the deprecated upload-artifact v3
+        uses: actions/upload-pages-artifact@v2
         with:
-          path: ./   # uploads repository root; adjust if you build to a dist/ directory
+          path: public
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v1
